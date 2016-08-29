@@ -1,0 +1,89 @@
+Drools - Workshop 
+____________________________
+
+* O que é o Drools? 
+
+É um sistema para gerenciamento de regras de negócio em tempo de execução. 
+
+* Qual sua vantagem? 
+
+Permite manter regras de negócio configuráveis em tempo de execução, sem a necessidade de implementar código em um serviço e realizar um novo deploy. Possui um algoritmo dinâmico para leitura de regras que permite a execução com grande performance.
+
+- Performance
+O Drools foi implementado tendo como prioridade garantir uma execução performática em sua chamada, não possuindo chamadas para o banco de dados possuindo todas suas informações em memória.
+
+- Como é uma regra
+Uma regra do drools possui 3 partes:
+
+ Cabeçalho:
+  Nesta parte é informado o nome da regra e sua descrição, bem também como sua prioridade de execução e validade.
+
+ Condições:
+  Nesta parte são informados quais condições são necessárias para a regra ser executada, onde são informados os *fatos* e especificados seus atributos e valores necessários.
+
+ Consequências:
+  Nesta parte são informados quais retornos irão existir dentro da regra após ela ser executada.
+
+* Como foi implementado na Unimed VTRP? 
+
+O sistema Drools VTRP possui sua tela principal onde é possível montar as regras e cada parte dela dinamicamente, ele possui uma combo onde são exibidos todas as Models do sistema para construção das regras.
+
+* Categorias e Subcategoria
+
+Como forma de organiar o vínculo das regras foram criados as Categorias e Subcategorias.
+
+Uma Subcategoria é a entidade que possui regras vinculadas.
+
+Uma Categoria é a entidade que possui subcategorias vinculadas.
+
+Uma regra pode ser vinculada com muitas subcategorias.
+
+Uma subcategoria pode ser vinculada com muitas categorias
+
+Todos os pontos de vínculo são gerenciados e mantidos pelo próprio usuário do sistema. Ele pode alterar como bem entender a qual subcategoria a regra faz parte bem como a qual categoria a subcategoria pertence.
+
+* Grupos
+
+A partir de uma tabela populada a partir do sistema Integração, é possível para o usuário construir um grupo de códigos que servirá de parÂmetro para verificar se o valor de um atributo de um fato está dentro deste grupo, sendo esta uma forma de condição de uma regra.
+
+* Retorno
+
+Para o retorno das regras hoje é possível selecionar Mensagens que são cadastradas e configuradas a partir do sistema e construir fatos para serem retornados, informando seus atributos e respectivos valores.
+
+* Versionamento de Regras
+
+É possível para o usuário gerar uma "cópia" de um estado atual da regra, gerando uma nova versão da mesma, permitindo alterar a regra sem modificar a versão anterior.
+
+* Publicação de uma Regra
+
+Para a regra funcionar em um ambiente é necessário o usuário publicá-la, ao selecionar a regra o usuário tem a possíbilidade de selecionar para qual ambiente a regra irá funcionar no caso: Desenvolvimento, Teste, Protótipo e Produção. Neste ponto também é necessário informar qual será a versão da regra que irá funcionar neste ambiente.
+Um ambiente não pode possuir mais de uma versão da mesma regra sendo executada, sendo necessário substituir a versão. Uma regra só entrará em funcionamento após possuir seus vínculos corretamente preenchidos.
+
+* Desacoplamento com Unimed VTRP
+
+Um dos grandes objetivos do sistema Drools foi implementar o mais desacoplado do modelo de negócio específico da Unimed VTRP, o sistema hoje não possui dependência com nenhum sistema propriamente voltado para o modelo de negócio da Unimed. Seu único vínculo seria no COMMON onde está sendo lido quais as models que ele exibirá em sua tela de implementação de regras. Podendo facilmente substituir qualquer model que irá ser exibida da tela sem problemas.
+
+Técnico: Para a leitura destas models, o Drools hoje visualiza um package e dentro dele realiza a leitura de todas as classes dentro dele, tomando como base para exibir na tela todas as classes que extenderem de `AbstractEntity`. Atualmente toda classe adicionada dentro do pacote `model` do common é exibido automaticamente no sistema Drools sem a necessidade de alterações no sistema. Colocou a classe no common, apareceu no Drools.W'
+
+* Como é executado? 
+
+Como explicado, as regras possuem vínculos e relações com Categorias.
+Para executar o Drools é necessário informar qual o grupo de regras será executado, existindo hoje 3 possibilidades:
+Executar todas as regras.
+Executar todas as regras de uma Categoria específica.
+Executar todas as regras de uma Subcategoria específica.
+
+O sistema que deseja utilizar o Drools, necessita informar quais serão os parâmetros para a execução das regras neste ponto de chamada, sendo opcional informar o código(hash) da categoria e/ou subcategoria caso o ponto necessite executar grupo de regras mais específico.
+O outro parâmetro a ser informado é qual ou quais objetos serão validados pelo Drools, o Drools consegue interpretar qualquer objeto informado para sua validação, onde se o objeto não possuir regras dentro do sistema, o retorno será vazio. Este objeto a ser validado pode ser a Model propriamente desejada para validação bem como uma Dto que possui várias models informadas dentro da mesma
+
+Para informar estes parâmetros ainda está sendo discutido como será mantido essa informação, a ideia principal no momento é da criação de uma tela de parâmetros para o usuário informar a categoria e/ou subcategoria das regras que serão executadas por ponto de chamada. Novamente a vantagem é que o Drools só espera a informação destes parâmetros de forma opcional. A forma que o sistema cliente irá chamar o Drools pode ser implementada como bem entendida.
+
+
+* O que é possível de fazer hoje?
+
+O Drools consegue retornar uma lista de mensagens ou objetos construídos a partir das regras, um objeto ou uma DTO é informado.
+Pelo problema do sistema ter sido concebido sem grandes cenários construídos e sem sistemas clientes existentes as implementações atuais foram pensadas em tentar cobrir várias situações que poderiam ocorrer.
+
+* Como interpretar seu retorno.
+
+Livecode
